@@ -1,7 +1,8 @@
+// "E:/Documents/Foobar2000/seekbar-with-gimmicks-github/single/seekbar-with-gimmicks.fx"
 ////////////////////////////////////////////////////////////////////////////////
 // Author:  just_Addict
 // Source:  based on effects by Zao, Anomulous, Axon, PurpleMonkey and others
-// Updated: Wednesday, 18 May, 2016 5:20:24 AM
+// Updated: 
 ////////////////////////////////////////////////////////////////////////////////
 //#define USE_PS_3_0
 //#define USE_PS_2_b 	// NVIDIA
@@ -13,14 +14,14 @@
 float  scaleY		= 0.95;
 float  contrast		= 1.0;		// only affects gradients
 float  brightness	= 1.0;		// changes overall color intensity
-bool   showZeroline	= 0;		// zeroline in moments of silence
+bool   showZeroLine	= 0;		// zeroline in moments of silence
 float  fuzzyEdge	= 0.0;		// range 0.00 to personal preference
 float  detailLevel	= 4.0;		// range 0 to 4.0, changes edge detail
 float  shadeAlpha	= 0.55;		// regular "shade played" alpha factor
 float  axisGamma	= 0.15;		// darker< 1 >lighter 'zero line'
 float  barWidth		= 1.50;		// width factor for position line
 float2 fadeFromTo = float2(0.8,0.7); 	// controls fading on the FADING_BAR
-float4 grid 	  = float4(5.0,0.0,2.0,0.75);
+float4 grid 	  = float4(3.0,0.0,2.0,0.75);
 /*
 //	grid.x = 4;		every nth row/column gets its color adjusted
 //	grid.y = 0;		currently unused so gridsquares stay square
@@ -40,34 +41,39 @@ float4 grid 	  = float4(5.0,0.0,2.0,0.75);
 //------------------------------------------------------------------------------
 //#define TRIPPY_SCROLLER
 //#define SOUNDCLOUD_LOOK
-#define HANGING_GARDEN
+//#define HANGING_GARDEN
 //#define DELFTS_BLUE
 //#define CLOUDY_SKIES
 //#define BEHIND_BARS
 //#define BEHIND_BLINDS
 
 //#define BASIC_LOOK
-//#define PRESET_TEST
+#define PRESET_TEST
 #ifdef PRESET_TEST
-//	#define SCALE_REPLAYGAIN
+	#define SCALE_REPLAYGAIN
 //	#define SCALE_CMAGNITUDE
-//	#define SCALE_TMAGNITUDE
-//	#define ASYMETRIC
-//	#define SHOW_RMS
-//	#define SHOW_CLIPPING
+	#define SCALE_TMAGNITUDE
+	#define ASYMETRIC
+	#define SHOW_RMS
+	#define SHOW_CLIPPING
+
 //	#define SOUNDCLOUD
 //	#define FLIP_CLOUD
 //	#define UI_COLORS
+
 //	#define CHINA_COLORS
 //	#define SNDCLOUD_COLORS
 //	#define GARDEN_COLORS
 //	#define SKY_COLORS
-//	#define CRAZY_COLORS
+//	#define TRIPPY_COLORS
+//	#define TRIPPY_MIRROR
 //	#define RAINBOW_COLORS
+
 //	#define GRADIENT_LDA
 //	#define GRADIENT_LDS
 //	#define FLIP_GRADIENT
 //	#define FLAT_GRADIENT
+
 //	#define NORMAL_HIGHLIGHT
 //	#define INNER_HIGHLIGHT
 //	#define INVERT_HIGHLIGHT
@@ -75,18 +81,22 @@ float4 grid 	  = float4(5.0,0.0,2.0,0.75);
 //	#define SEPIA_HIGHLIGHT
 //	#define CSHIFT_HIGHLIGHT
 //	#define MIRROR_HIGHLIGHT
+
 //	#define GRID_VERTICAL
 //	#define GRID_HORIZONTAL
+
 //	#define BORDER_ON_HIGHLIGHT
 //	#define X_AXIS_ON_HIGHLIGHT
 //	#define BORDER_ON_FULLWIDTH
 //	#define X_AXIS_ON_FULLWIDTH
+
 //	#define NORMAL_BAR
 //	#define FADING_BAR
 //	#define INSIDE_BAR
 //	#define OUTSIDE_BAR
 //	#define CHEEZY_BAR
 //	#define CHEEZY_MAGNIFY
+
 //	#define DO_SCROLL
 #endif
 ////////////////////////////////////////////////////////////////////////////////
@@ -107,7 +117,7 @@ float4 grid 	  = float4(5.0,0.0,2.0,0.75);
 	#define UI_COLORS
 	#undef CHINA_COLORS
 	#undef CLOUD_COLORS
-	#undef CRAZY_COLORS
+	#undef TRIPPY_COLORS
 	#undef RAINBOW_COLORS
 	#undef GRADIENT_LDA
 	#undef GRADIENT_LDS
@@ -167,7 +177,7 @@ float4 grid 	  = float4(5.0,0.0,2.0,0.75);
 	#define SCALE_CMAGNITUDE
 	#define ASYMETRIC
 	#define SHOW_RMS
-	#define CRAZY_COLORS
+	#define TRIPPY_COLORS
 	#define OUTSIDE_BAR
 	#define CHEEZY_MAGNIFY
 	#define DO_SCROLL
@@ -266,7 +276,7 @@ float4 highlightColor  = float4(0.4531,0.6094,0.8008,1);
 float4 selectionColor  = float4(0.4531,0.6757,0.8359,1);
 #endif
 //------------------------------------------------------------------------------
-#ifdef CRAZY_COLORS
+#ifdef TRIPPY_COLORS
 #undef UI_COLORS
 float4 backgroundColor = float4(0.0000,0.0000,0.2500,1);
 float4 textColor       = float4(0.3750,0.5000,0.6250,1);
@@ -293,10 +303,8 @@ bool   shadePlayed     : SHADEPLAYED;
 /*
 // the shader semantic REPLAYGAIN is a float4 containing the replaygain values
 //
-//	R is album gain
-//	B is track gain
-//	G is album peak
-//	A is track peak
+//	R is album gain, G is album peak
+//	B is track gain, A is track peak
 */
 float4 replayGain      : REPLAYGAIN;
 /*
@@ -375,32 +383,32 @@ PS_IN VS( VS_IN input )
 	PS_IN output = (PS_IN)0;
 	float2 half_pixel = float2(1,-1) / viewportSize;
 	output.pos = float4(input.pos - half_pixel, 0, 1);
-//	float2 fudge = scrollSpeed * viewportSize / 100; // .
-	float2 fudge = viewportSize / 100; // .
+	//float2 fudge = scrollSpeed * viewportSize / 100; 
+	float2 fudge = viewportSize / 100; 
 
 	if (horizontal)
 	{
-#ifdef DO_SCROLL
+		#ifdef DO_SCROLL
 		output.tc = float2(( input.tc.x + cursorPos * trackDuration/fudge.x) * (fudge.x/trackDuration), input.tc.y);
-#else
+		#else
 		output.tc = float2(( input.tc.x + 1.0) / 2.0, input.tc.y);
-#endif
+		#endif
 	}
 	else
 	{
-#ifdef DO_SCROLL
+		#ifdef DO_SCROLL
 		output.tc = float2((-input.tc.y + cursorPos * trackDuration/fudge.y) * (fudge.y/trackDuration), input.tc.x);
-#else
+		#else
 		output.tc = float2((-input.tc.y + 1.0) / 2.0, input.tc.x);
-#endif
+		#endif
 	}
 
 	if (flipped)
-#ifdef DO_SCROLL
+		#ifdef DO_SCROLL
 		output.tc.x = 0.0 - output.tc.x + (trackTime/trackDuration) * 2;
-#else
+		#else
 		output.tc.x = 1.0 - output.tc.x;
-#endif
+		#endif
 	return output;
 }
 //------------------------------------------------------------------------------
@@ -506,22 +514,24 @@ float4 replaygain_scale( float4 minmaxrms )
 	return minmaxrms;
 }
 #endif
+//------------------------------------------------------------------------------
 // The example originally posted by Zao used tc, which scales the output
-// this affects all calculations where tc.y and d.y are both involved
+// this affects all calculations where tc.y and delta.y are both involved
 // ideally scaling should be done on the input (i.e. minmaxrms data) so
 // we don't have to account for a tc.y range not always going from [-1,1]
 // sadly this does not fly with RMS (or I didn't see how)
-#if defined(SCALE_CMAGNITUDE) || defined(SCALE_TMAGNITUDE)
-float magnitude_scale( float tcy, float4 magnitudeType, float baseLine )
-{
+//------------------------------------------------------------------------------
 // CHANNELMAGNITUDE contains the values for the current channel being drawn.
 // TRACKMAGNITUDE contains the most significant values from all channels.
 // Requires "foo_wave_seekbar" version 0.2.34 or higher
-#ifdef ASYMETRIC
+#if defined(SCALE_CMAGNITUDE) || defined(SCALE_TMAGNITUDE)
+void magnitude_scale( inout float tcy, float4 magnitudeType )
+{
+	#ifdef ASYMETRIC
 	float magnitude = max(-magnitudeType.r, magnitudeType.g);
-#else
+	#else
 	float magnitude = max(abs(magnitudeType.r), abs(magnitudeType.g));
-#endif
+	#endif
 	if (magnitude < scaleY)
 	{
 	#ifdef ASYMETRIC
@@ -535,14 +545,15 @@ float magnitude_scale( float tcy, float4 magnitudeType, float baseLine )
 	#endif
 	}
 	else
-	if (magnitude > scaleY) tcy /= scaleY;
-	return tcy;
+	if (magnitude > scaleY)
+		tcy /= scaleY;
+//	return tcy;
 }
 #endif
 //------------------------------------------------------------------------------
 // Miscellaneous colorspace functions
 //------------------------------------------------------------------------------
-#if defined(CRAZY_COLORS) || defined(RAINBOW_COLORS)
+#if defined(TRIPPY_COLORS) || defined(RAINBOW_COLORS)
 float4 hue( float H )
 {
 	float R = abs(H * 6 - 3) - 1;
@@ -596,7 +607,7 @@ float4 sepia( float4 color )
 // If you want two particular hues, use the colour picker to find the hue values
 // then subtract them and divide by 38.2.
 ////////////////////////////////////////////////////////////////////////////////
-#if defined(CSHIFT_HIGHLIGHT) || defined(CRAZY_COLORS)
+#if defined(CSHIFT_HIGHLIGHT) || defined(TRIPPY_COLORS)
 float4 cshift( float4 color , float theta )
 {
 	float4 a;
@@ -617,11 +628,11 @@ float4 cshift( float4 color , float theta )
 // TODO: Make it draw two lines, each half the weight, one darker, one lighter
 //------------------------------------------------------------------------------
 #if defined(GRID_VERTICAL) || defined(GRID_HORIZONTAL)
-float4 draw_grid( float2 tc, float4 aColor, float2 d, float fd, float baseLine, bool insideWave )
+float4 draw_grid( float2 tc, float4 aColor, float2 delta, float fDelta, float baseLine, bool insideWave )
 {
 	float fudge = 1;
 #ifdef DO_SCROLL
-	fudge = (trackDuration / fd)/2;
+	fudge = (trackDuration / fDelta) / 2;
 #endif
 //
 // grid.x : x and/or y interval
@@ -634,12 +645,13 @@ float4 draw_grid( float2 tc, float4 aColor, float2 d, float fd, float baseLine, 
 	#ifdef HANGING_GARDEN
 	&& (tc.y-(baseLine) <= 0 && !insideWave)
 	#endif
-	&& ((tc.x*fudge) % (d.x*grid.x)   < (d.x*grid.z)))
+	&& ((tc.x * fudge) % (delta.x * grid.x)   < (delta.x * grid.z)))
 		aColor *= grid.a;
 #endif
+
 #ifdef GRID_VERTICAL
 	if (grid.x > 1
-	&& ((1-tc.y)     % (d.y*grid.x*2) < (d.y*grid.z*2)))
+	&& ((1-tc.y)     % (delta.y * grid.x * 2) < (delta.y * grid.z * 2)))
 		aColor *= grid.a;
 #endif
 	return aColor;
@@ -649,7 +661,7 @@ float4 draw_grid( float2 tc, float4 aColor, float2 d, float fd, float baseLine, 
 // Colors border pixels along the left, top, right and.or bottom edges
 //------------------------------------------------------------------------------
 #if defined(BORDER_ON_HIGHLIGHT) || defined(BORDER_ON_FULLWIDTH) || defined(X_AXIS_ON_HIGHLIGHT) || defined(X_AXIS_ON_FULLWIDTH)
-float4 draw_border( float4 aColor, float2 tc, float barThickness, float2 d, float fd, float baseLine )
+float4 draw_border( float4 aColor, float2 tc, float barThickness, float2 delta, float fDelta, float baseLine )
 {
 	bool correctSide;
 #ifdef MIRROR_HIGHLIGHT
@@ -660,7 +672,7 @@ float4 draw_border( float4 aColor, float2 tc, float barThickness, float2 d, floa
 	correctSide = tc.x < cursorPos;
 #endif
 
-	float edge = d.x;
+	float edge = delta.x;
 #ifdef DO_SCROLL
 	edge *= barThickness*2;
 #endif
@@ -679,7 +691,7 @@ float4 draw_border( float4 aColor, float2 tc, float barThickness, float2 d, floa
 
 #if defined(BORDER_ON_HIGHLIGHT) || defined(BORDER_ON_FULLWIDTH)
 	// only those tc.y's that are near the top or the bottom of the channel
-	if ( (tc.y >= (1.0 - d.y*2)|| tc.y <= (d.y*2 - 1.0))
+	if ( (tc.y >= (1.0 - delta.y * 2)|| tc.y <= (delta.y * 2 - 1.0))
 	#ifndef BORDER_ON_FULLWIDTH
 		&& correctSide
 	#endif
@@ -690,7 +702,7 @@ float4 draw_border( float4 aColor, float2 tc, float barThickness, float2 d, floa
 // does not position correctly with magnitude scaling, but does with soundcloud
 #if defined(X_AXIS_ON_HIGHLIGHT) || defined(X_AXIS_ON_FULLWIDTH)
 	// baseline (=offset for soundcloud) is tc.y value for magnitude 'zero'
-	if (tc.y-baseLine > -d.y*1.25 && tc.y-baseLine < d.y*1.25
+	if (tc.y-baseLine > -delta.y * 1.25 && tc.y-baseLine < delta.y * 1.25
 	#ifndef X_AXIS_ON_FULLWIDTH
 		&& correctSide
 	#endif
@@ -703,9 +715,9 @@ float4 draw_border( float4 aColor, float2 tc, float barThickness, float2 d, floa
 //------------------------------------------------------------------------------
 // Utilities
 //------------------------------------------------------------------------------
-float4 rmsfactors( float2 tc, float2 dVP, float4 minmaxrms, float border )
+float4 rmsfactors( float2 tc, float2 vpDelta, float4 minmaxrms, float border )
 {
-	float zeroLine    = showZeroline ? border : dVP.y/2;
+	float zeroLine    = showZeroLine ? border : vpDelta.y / 2;
 	float factor      = 1.0;
 	bool  insideRms   = false;
 // fuzzFactor controls the feathering at the edges of the wave
@@ -789,10 +801,10 @@ float3 zao( float2 tc, float baseLine )
 // LOD:  controls the sloping, the range coincide with actual LODs but goes to 4
 ////////////////////////////////////////////////////////////////////////////////
 #if defined(CHEEZY_BAR) || defined(CHEEZY_MAGNIFY)
-float4 cheezyzoomer( float2 tc, float2 dVP )
+float4 cheezyzoomer( float2 tc, float2 vpDelta )
 {
 	float LOD = 0;
-	float diopt = 0.005;
+	float diopt = 0.001;
 #ifdef CHEEZY_BAR
 	float pos = cursorPos;
 #else
@@ -808,14 +820,14 @@ float4 cheezyzoomer( float2 tc, float2 dVP )
 	diopt = 0.0025;
 #endif
 	float xd = tc.x - pos,
-		y = (1/2-1),
-		u = -(2*xd / (diopt)) * (2*xd / (diopt)),
+		y = (1 / 2 - 1),
+		u = -(2 * xd / (diopt)) * (2  *xd / (diopt)),
 		E = exp(u / 2);
 
 	float4 minmaxrms = tex1Dbias(sTex, float4(
-		tc.x + xd*y*E,
+		tc.x + xd * y * E,
 		0, 0,
-		log2(2048*dVP.x*(0.1+4.0-LOD) * (1 + y*E*(1+u/2)))
+		log2(2048 * vpDelta.x * (0.1 + 4.0 - LOD) * (1 + y * E * (1 + u / 2)))
 		));
 	return minmaxrms;
 }
@@ -823,7 +835,7 @@ float4 cheezyzoomer( float2 tc, float2 dVP )
 //------------------------------------------------------------------------------
 // Meat
 //------------------------------------------------------------------------------
-float4 evaluate( float4 fgInput, float4 bgInput, float2 tc , float barThickness, float2 dVP, float fd, float baseLine )
+float4 evaluate( float4 fgInput, float4 bgInput, float2 tc , float barThickness, float2 vpDelta, float fDelta, float baseLine )
 {
 	bool alphaShade = false;
 	float4 minmaxrms = tex1D(sTex, tc.x);
@@ -841,8 +853,8 @@ float4 evaluate( float4 fgInput, float4 bgInput, float2 tc , float barThickness,
 	lowerLimit = 0.0001;
 #endif
 // the *10 does not control sensitivity, but only how far color extends at peaks
-	if (((tc.y   > minmaxrms.g-dVP.y*10) && (minmaxrms.g >= upperLimit))
-	||  ((tc.y+1 < minmaxrms.r+dVP.y*10) && (minmaxrms.r <= lowerLimit)))
+	if (((tc.y   > minmaxrms.g - vpDelta.y * 10) && (minmaxrms.g >= upperLimit))
+	||  ((tc.y+1 < minmaxrms.r + vpDelta.y * 10) && (minmaxrms.r <= lowerLimit)))
 		return peakColor;
 #endif
 // Both Magnitude scaling and SoundCloud alter the value of the passed in tc.y
@@ -851,7 +863,7 @@ float4 evaluate( float4 fgInput, float4 bgInput, float2 tc , float barThickness,
 // This applies to gradients, border and grid texel calculations.
 	float2 tc_copy = tc;
 #if defined(CHEEZY_BAR) || defined(CHEEZY_MAGNIFY)
-	minmaxrms = cheezyzoomer(tc, dVP);
+	minmaxrms = cheezyzoomer(tc, vpDelta);
 #endif
 /*	minmaxrms contains the datapoint from the current sample
 //	R = Minimum Peak
@@ -893,20 +905,20 @@ float4 evaluate( float4 fgInput, float4 bgInput, float2 tc , float barThickness,
 	#elif defined(SCALE_TMAGNITUDE)
 		float4 magnitudeType = trackMagnitude;
 	#endif
-		tc.y = magnitude_scale( tc.y, magnitudeType, baseLine );
+		magnitude_scale( tc.y, magnitudeType );
 	#if defined(ASYMETRIC) && defined(DEBUG)
 	// test to see if we actually reach the edges with low amplitude tracks
 	// NOTE: the *10 does not control sensitivity, but only how far the color
 	// extends into the wave at moments when it reaches highest/lowest peaks.
 		peakColor = float4(0.0,1.0,0.0,1);
 		// make sure we are looking at and are on the bottom half
-		if (( (tc_copy.y < dVP.y*10-1 && minmaxrms.r < 0 && magnitudeType.r < 0)
+		if (( (tc_copy.y < vpDelta.y * 10 - 1 && minmaxrms.r < 0 && magnitudeType.r < 0)
 		// check if current magnitude is near the lowest peak
-			&& minmaxrms.r  <= magnitudeType.r+dVP.y/2)
+			&& minmaxrms.r  <= magnitudeType.r+vpDelta.y / 2)
 		// make sure we are looking at and are on the upper half
-		||  ( (tc_copy.y > 1-dVP.y*10 && minmaxrms.g > 0 && magnitudeType.g > 0)
+		||  ( (tc_copy.y > 1 - vpDelta.y * 10 && minmaxrms.g > 0 && magnitudeType.g > 0)
 		// check if current magnitude is near the highest peak
-			&& minmaxrms.g  >= magnitudeType.g-dVP.y/2)
+			&& minmaxrms.g  >= magnitudeType.g - vpDelta.y / 2)
 		)
 		return peakColor;
 	#endif
@@ -914,7 +926,7 @@ float4 evaluate( float4 fgInput, float4 bgInput, float2 tc , float barThickness,
 #endif
 
 // returns float4(insideWave, factorWave, insideRms, factor);
-	float4 factors = rmsfactors(tc, dVP, minmaxrms, barWidth*dVP.y);
+	float4 factors = rmsfactors(tc, vpDelta, minmaxrms, barWidth * vpDelta.y);
 
 #ifdef FLAT_GRADIENT
 	float offset = -0.45+1.85*contrast;
@@ -982,13 +994,13 @@ float4 evaluate( float4 fgInput, float4 bgInput, float2 tc , float barThickness,
 #elif defined(CSHIFT_HIGHLIGHT)
 		alphaShade = false;
 	#if !defined(INNER_HIGHLIGHT)
-		bg = cshift( bgInput , realTime/10 % 360);
+		bg = cshift( bgInput , realTime / 10 % 360);
 	#endif
-		fg = cshift( fgInput , -180+realTime/10 % 360);
+		fg = cshift( fgInput , -180 + realTime / 10 % 360);
 #endif
 	}
 	fg1 = fg;
-	fg2 = fg1+0.3;
+	fg2 = fg1 + 0.3;
 /*
 	// if fg1 becomes equal to bg then make fg1 darker
 	if (fg1.r == bg.r  && fg1.g == bg.g  && fg1.b == bg.b ) fg1 -= 0.1;
@@ -1001,24 +1013,24 @@ float4 evaluate( float4 fgInput, float4 bgInput, float2 tc , float barThickness,
 // still, it can look weird in some combinations...too bad about the slots it uses
 //	if (fg2.r == bg.r  && fg2.g == bg.g  && fg2.b == bg.b)  fg2 -= 0.15;
 */
-#if  defined(CRAZY_COLORS)
+#if  defined(TRIPPY_COLORS)
 // uses hardcoded colors to get the largest rotation
 	bg  = bg + (tc_copy.y/4) * bkFlip;
-	fg1 = cshift( hue(fg + tc_copy.y * offset),(realTime/2) % 360);
-	fg2 = cshift( hue(fg - tc_copy.y * offset),(realTime/2) % 360);
+	fg1 = cshift( hue(fg + tc_copy.y * offset), (realTime / 2) % 360);
+	fg2 = cshift( hue(fg - tc_copy.y * offset), (realTime / 2) % 360);
 #elif defined(RAINBOW_COLORS)
 	fg  = float4(0.375,0.5,0.625,1);
-	bg  =     bg +(tc_copy.y/4) * bkFlip;
-	fg1 = hue(fg - tc_copy.y    * offset);
-	fg2 = hue(fg + tc_copy.y    * offset);
+	bg  =     bg +(tc_copy.y / 4) * bkFlip;
+	fg1 = hue(fg - tc_copy.y      * offset);
+	fg2 = hue(fg + tc_copy.y      * offset);
 #elif defined(GRADIENT_LDA)
-	bg  = bg +    (tc_copy.y/4) *-bkFlip;
-	fg1 = fg +     tc_copy.y    * offset;
-	fg2 = fg -     tc_copy.y    * offset;
+	bg  = bg +    (tc_copy.y / 4) *-bkFlip;
+	fg1 = fg +     tc_copy.y      * offset;
+	fg2 = fg -     tc_copy.y      * offset;
 #elif defined(GRADIENT_LDS)
-	bg  = bg + abs(tc_copy.y/4) *-bkFlip;
-	fg1 = fg + abs(tc_copy.y)   * offset;
-	fg2 = fg - abs(tc_copy.y)   * offset;
+	bg  = bg + abs(tc_copy.y / 4) *-bkFlip;
+	fg1 = fg + abs(tc_copy.y)     * offset;
+	fg2 = fg - abs(tc_copy.y)     * offset;
 #endif
 
 	bg  *= brightness;
@@ -1049,11 +1061,11 @@ float4 evaluate( float4 fgInput, float4 bgInput, float2 tc , float barThickness,
 	}
 
 #if defined(GRID_VERTICAL) || defined(GRID_HORIZONTAL)
-		wave = draw_grid(tc_copy, wave,dVP,  fd, baseLine, factors.r);
+		wave = draw_grid(tc_copy, wave, vpDelta, fDelta, baseLine, factors.r);
 #endif
 
 #if defined(BORDER_ON_HIGHLIGHT) || defined(BORDER_ON_FULLWIDTH) || defined(X_AXIS_ON_HIGHLIGHT) || defined(X_AXIS_ON_FULLWIDTH)
-		wave = draw_border(wave, tc_copy, barThickness, dVP, fd, baseLine);
+		wave = draw_border(wave, tc_copy, barThickness, vpDelta, fDelta, baseLine);
 #endif
 #if   defined(NORMAL_BAR)
 		wave = bar(cursorPos, tc, wave, barThickness, cursorVisible);
@@ -1073,50 +1085,50 @@ float4 evaluate( float4 fgInput, float4 bgInput, float2 tc , float barThickness,
 //------------------------------------------------------------------------------
 float4 PS( PS_IN input ) : SV_Target
 {
-	float fd;
-	float2 dVP;
-	float2 d = 1.0 / viewportSize;
+	float fDelta;
+	float2 vpDelta;
+	float2 delta = 1.0 / viewportSize;
 //	float2 fudge = scrollSpeed * viewportSize / 100; // .
 	float2 fudge = viewportSize / 100;
 
 	if (horizontal)
 	{
-		dVP.x = d.x;
-		dVP.y = d.y;
-		fd = fudge.x;
+		vpDelta.x = delta.x;
+		vpDelta.y = delta.y;
+		fDelta = fudge.x;
 	}
 	else
 	{
-		dVP.x = d.y;
-		dVP.y = d.x;
-		fd = fudge.y;
+		vpDelta.x = delta.y;
+		vpDelta.y = delta.x;
+		fDelta = fudge.y;
 	}
 
 // used for soundcloud and borders (to draw x-axis in correct location)
 	float baseLine = 0;
 // used to control where the left edge is painted if borders visible
 	float start = 0;
-	float barThickness = dVP.x * barWidth;
+	float barThickness = vpDelta.x * barWidth;
 
 #ifdef SOUNDCLOUD
 	#ifdef FLIP_CLOUD
-	baseLine = 1.0/3.0;
+	baseLine = 1.0 / 3.0;
 	#else
 // puts the 'zero' line at 1/3 from bottom within -1,1 range
-	baseLine = -1.0/3.0;
+	baseLine = -1.0 / 3.0;
 	#endif
 #endif
 #ifdef DO_SCROLL
 // position the left edge border when scrolling is active
-	start = -dVP.x/fd*4;
-	barThickness = dVP.x * (barWidth / (trackDuration / fd)) * barWidth;
+	start = -vpDelta.x / fDelta * 4;
+	barThickness = vpDelta.x * (barWidth / (trackDuration / fDelta)) * barWidth;
 #endif
 
 // initialize to background color for left part before the start of the track
 	float4 c0 = backgroundColor;
 // Evaluate now takes care of calling all of the separate functions
-	if (input.tc.x > start && input.tc.x < 1.0-start) {
-		c0 = evaluate(textColor, backgroundColor, input.tc, barThickness, dVP, fd, baseLine);
+	if (input.tc.x > start && input.tc.x < 1.0 - start) {
+		c0 = evaluate(textColor, backgroundColor, input.tc, barThickness, vpDelta, fDelta, baseLine);
 	}
 
 	return c0;
